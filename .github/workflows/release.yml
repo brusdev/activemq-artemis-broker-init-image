@@ -17,13 +17,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build the image
-        run: docker build --tag $IMAGE_NAME:latest .
+        run: podman build --tag $IMAGE_NAME:latest .
 
       - name: Push the image
         run: >
           export IMAGE_TAG=${GITHUB_REF#refs/tags/v} &&
-          docker login quay.io --username=${{ secrets.QUAY_USERNAME }} --password-stdin <<< ${{ secrets.QUAY_PASSWORD }} &&
-          docker tag $IMAGE_NAME:latest quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:$IMAGE_TAG &&
-          docker push quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:$IMAGE_TAG &&
-          docker tag $IMAGE_NAME:latest quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:latest &&
-          docker push quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:latest
+          podman login quay.io --username=${{ secrets.QUAY_USERNAME }} --password-stdin <<< ${{ secrets.QUAY_PASSWORD }} &&
+          podman tag $IMAGE_NAME:latest quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:$IMAGE_TAG &&
+          podman push quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:$IMAGE_TAG &&
+          podman tag $IMAGE_NAME:latest quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:latest &&
+          podman push quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:latest
