@@ -25,7 +25,7 @@ jobs:
       - name: Push the image
         if: ${{ github.event_name == 'push' }}
         run: >
-          export IMAGE_ID=$(cat IMAGE_ID)
+          export IMAGE_ID=$(cat IMAGE_ID) &&
           export IMAGE_TAG=dev.$(date +%Y%m%d).$(git rev-parse --short "$GITHUB_SHA") &&
           podman login quay.io --username=${{ secrets.QUAY_USERNAME }} --password-stdin <<< ${{ secrets.QUAY_PASSWORD }} &&
           podman push $IMAGE_ID quay.io/${{ secrets.QUAY_NAMESPACE }}/$IMAGE_NAME:$IMAGE_TAG &&
