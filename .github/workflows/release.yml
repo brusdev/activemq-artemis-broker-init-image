@@ -9,9 +9,9 @@ on:
       - 'v*'
   workflow_dispatch:
     inputs:
-      update_release_tag:
-        description: 'Update release tag'
-        required: true
+      trigger_children:
+        description: 'Trigger children'
+        required: false
         default: false
         type: boolean
 
@@ -23,23 +23,18 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
 
-      - name: Check release tag
+      - name: Create release tag
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           git fetch --tags
-          RELEASE_TAG="v$(grep -Po -m 1 '(?<=^LABEL version=")[^"]+' Dockerfile)"
-          if [ "${{ github.event.inputs.update_release_tag}}" = "true" ]; then
-            GIT_OPTIONS='--force'
-            GIT_TAG=''
-          else
-            GIT_OPTIONS=''
-            GIT_TAG=$(git describe --exact-match --tags || true)
-          fi
-          if [[ ! $GIT_TAG =~ ^$RELEASE_TAG.*$ ]]; then
-            git config user.name 'ArtemisCloud Bot'
-            git config user.email 'artemiscloudbot@users.noreply.github.com'
-            git tag -a ${RELEASE_TAG} -m ${RELEASE_TAG} ${GIT_OPTIONS}
-            git push origin $RELEASE_TAG ${GIT_OPTIONS}
+          HEAD_COMMIT="$(git rev-parse HEAD)"
+          RELEASE_TAG="v$(grep -m 1 -oP '(?<=LABEL version=")[^"]+' Dockerfile)"
+          RELEASE_TAG_COMMIT="$(git rev-list -n 1 ${RELEASE_TAG} || true)"
+          if [ "$RELEASE_TAG_COMMIT" != "$HEAD_COMMIT" ]; then
+            git config user.name 'artemiscloud-bot'
+            git config user.email 'bot@artemiscloud.io'
+            git tag -a ${RELEASE_TAG} -m ${RELEASE_TAG} --force
+            git push origin $RELEASE_TAG --force
           fi
 
       - name: Build the image
