@@ -18,7 +18,7 @@ WORKDIR $REMOTE_SOURCE_DIR/app
 
 RUN chmod g+rwx $REMOTE_SOURCE_DIR/app
 
-RUN microdnf install -y python38 python38-jinja2 python38-pyyaml && \
+RUN microdnf install -y python3 python3-jinja2 python3-pyyaml && \
     microdnf clean all && rm -rf /var/cache/yum
 
 RUN python3 setup.py install
